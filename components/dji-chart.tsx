@@ -121,5 +121,3 @@ export function DJIChart() {
     </Card>
   )
 }
-
-
