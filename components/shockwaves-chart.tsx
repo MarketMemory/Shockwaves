@@ -1,40 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine, Area, AreaChart } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { historicalData, majorCrashes } from "@/lib/crash-data"
 import { Activity, Zap } from "lucide-react"
-import { useShockwavesData } from "@/hooks/use-shockwaves-data"
-import { elliotWaves, elliotWaveDegrees } from "@/lib/crash-data"
 
-interface ShockwavesChartProps {
-  showWaves?: boolean
-  visibleDegrees?: string[]
-}
-
-export function ShockwavesChart({
-  showWaves: showWavesProp = true,
-  visibleDegrees: visibleDegreesProp = ["grand-supercycle", "supercycle", "cycle"],
-}: ShockwavesChartProps) {
+export function ShockwavesChart() {
   const [selectedPeriod, setSelectedPeriod] = useState("ALL")
   const [showCrashes, setShowCrashes] = useState(true)
-  const [showWaves, setShowWaves] = useState(showWavesProp)
-  const [visibleDegrees, setVisibleDegrees] = useState(visibleDegreesProp)
-
-  // Sync with props when they change
-  useEffect(() => {
-    setShowWaves(showWavesProp)
-  }, [showWavesProp])
-
-  useEffect(() => {
-    setVisibleDegrees(visibleDegreesProp)
-  }, [visibleDegreesProp])
-
-  const { data, loading } = useShockwavesData()
-  const { historicalData, crashes: majorCrashes } = data
 
   const periods = [
     { label: "1920s", value: "1920s" },
@@ -68,14 +45,6 @@ export function ShockwavesChart({
             >
               💥 Crashes
             </Button>
-            <Button
-              variant={showWaves ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowWaves(!showWaves)}
-              className="bg-blue-600 hover:bg-blue-700 border-blue-600"
-            >
-              🌊 Elliott Waves
-            </Button>
           </div>
         </div>
 
@@ -99,126 +68,84 @@ export function ShockwavesChart({
       </CardHeader>
 
       <CardContent>
-        {loading && (
-          <div className="flex items-center justify-center h-[500px]">
-            <div className="text-slate-400">Loading shockwaves data...</div>
-          </div>
-        )}
+        <ChartContainer
+          config={{
+            value: {
+              label: "DJI Waarde",
+              color: "hsl(var(--chart-1))",
+            },
+          }}
+          className="h-[500px]"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={historicalData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+              <defs>
+                <linearGradient id="shockwaveGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-20" stroke="#475569" />
+              <XAxis
+                dataKey="year"
+                tick={{ fontSize: 12, fill: "#94a3b8" }}
+                tickFormatter={(value) => value.toString()}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: "#94a3b8" }}
+                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+              />
+              <ChartTooltip
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    const crash = majorCrashes.find((c) => c.year === label)
+                    return (
+                      <div className="bg-slate-800 p-4 border border-slate-600 rounded-lg shadow-xl">
+                        <p className="font-bold text-slate-200 text-lg">{label}</p>
+                        <p className="text-red-400 text-xl font-bold">${payload[0].value?.toLocaleString()}</p>
+                        {crash && showCrashes && (
+                          <div className="mt-3 pt-3 border-t border-slate-600">
+                            <Badge variant="destructive" className="mb-2 bg-red-600">
+                              💥 {crash.name}
+                            </Badge>
+                            <p className="text-sm text-slate-300 leading-relaxed">{crash.description}</p>
+                            <p className="text-red-400 font-bold mt-2">Impact: {crash.impact}</p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  }
+                  return null
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="#ef4444"
+                strokeWidth={2}
+                fill="url(#shockwaveGradient)"
+                dot={false}
+                activeDot={{ r: 6, fill: "#ef4444", stroke: "#ffffff", strokeWidth: 2 }}
+              />
 
-        {!loading && (
-          <ChartContainer
-            config={{
-              value: {
-                label: "DJI Waarde",
-                color: "hsl(var(--chart-1))",
-              },
-            }}
-            className="h-[500px]"
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={historicalData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                <defs>
-                  <linearGradient id="shockwaveGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-20" stroke="#475569" />
-                <XAxis
-                  dataKey="year"
-                  tick={{ fontSize: 12, fill: "#94a3b8" }}
-                  tickFormatter={(value) => value.toString()}
-                />
-                <YAxis
-                  tick={{ fontSize: 12, fill: "#94a3b8" }}
-                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                />
-                <ChartTooltip
-                  content={({ active, payload, label }) => {
-                    if (active && payload && payload.length) {
-                      const crash = majorCrashes.find((c) => c.year === label)
-                      const wave = elliotWaves.find((w) => w.year === label)
-                      return (
-                        <div className="bg-slate-800 p-4 border border-slate-600 rounded-lg shadow-xl">
-                          <p className="font-bold text-slate-200 text-lg">{label}</p>
-                          <p className="text-red-400 text-xl font-bold">${payload[0].value?.toLocaleString()}</p>
-                          {crash && showCrashes && (
-                            <div className="mt-3 pt-3 border-t border-slate-600">
-                              <Badge variant="destructive" className="mb-2 bg-red-600">
-                                💥 {crash.name}
-                              </Badge>
-                              <p className="text-sm text-slate-300 leading-relaxed">{crash.description}</p>
-                              <p className="text-red-400 font-bold mt-2">Impact: {crash.impact}</p>
-                            </div>
-                          )}
-                          {wave && showWaves && (
-                            <div className="mt-2 pt-2 border-t border-slate-600">
-                              <Badge
-                                variant="secondary"
-                                className="mb-1"
-                                style={{ backgroundColor: elliotWaveDegrees.find((d) => d.id === wave.degree)?.color }}
-                              >
-                                🌊 {elliotWaveDegrees.find((d) => d.id === wave.degree)?.symbol} {wave.wave}
-                              </Badge>
-                              <p className="text-sm text-slate-300">{wave.title}</p>
-                            </div>
-                          )}
-                        </div>
-                      )
-                    }
-                    return null
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#ef4444"
-                  strokeWidth={2}
-                  fill="url(#shockwaveGradient)"
-                  dot={false}
-                  activeDot={{ r: 6, fill: "#ef4444", stroke: "#ffffff", strokeWidth: 2 }}
-                />
-
-                {showCrashes &&
-                  majorCrashes.map((crash, index) => (
-                    <ReferenceLine
-                      key={`crash-${index}`}
-                      x={crash.year}
-                      stroke="#ef4444"
-                      strokeWidth={3}
-                      strokeDasharray="8 4"
-                      label={{
-                        value: `💥 ${crash.name}`,
-                        position: "topLeft",
-                        className: "text-xs fill-red-400 font-bold",
-                      }}
-                    />
-                  ))}
-                {showWaves &&
-                  elliotWaves
-                    .filter((wave) => visibleDegrees.includes(wave.degree))
-                    .map((wave, index) => {
-                      const degreeInfo = elliotWaveDegrees.find((d) => d.id === wave.degree)
-                      return (
-                        <ReferenceLine
-                          key={`wave-${index}`}
-                          x={wave.year}
-                          stroke={degreeInfo?.color || "#0099cc"}
-                          strokeWidth={2}
-                          strokeDasharray={wave.confidence === "projection" ? "10 5" : "2 2"}
-                          label={{
-                            value: `${degreeInfo?.symbol} ${wave.wave}`,
-                            position: "topRight",
-                            className: "text-xs font-bold",
-                            style: { fill: degreeInfo?.color || "#0099cc" },
-                          }}
-                        />
-                      )
-                    })}
-              </AreaChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        )}
+              {showCrashes &&
+                majorCrashes.map((crash, index) => (
+                  <ReferenceLine
+                    key={index}
+                    x={crash.year}
+                    stroke="#ef4444"
+                    strokeWidth={3}
+                    strokeDasharray="8 4"
+                    label={{
+                      value: `💥 ${crash.name}`,
+                      position: "topLeft",
+                      className: "text-xs fill-red-400 font-bold",
+                    }}
+                  />
+                ))}
+            </AreaChart>
+          </ResponsiveContainer>
+        </ChartContainer>
       </CardContent>
     </Card>
   )

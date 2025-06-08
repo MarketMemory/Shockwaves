@@ -7,12 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, TrendingDown, AlertTriangle, Zap } from "lucide-react"
-import { useShockwavesData } from "@/hooks/use-shockwaves-data"
+import { majorCrashes } from "@/lib/crash-data"
 
 export function CrashTimeline() {
   const [showAddForm, setShowAddForm] = useState(false)
-  const { data } = useShockwavesData()
-  const majorCrashes = data.crashes
 
   const getCrashIcon = (severity: string) => {
     switch (severity) {
@@ -88,7 +86,7 @@ export function CrashTimeline() {
         )}
 
         <div className="space-y-3 max-h-[600px] overflow-y-auto">
-          {majorCrashes?.map((crash, index) => (
+          {majorCrashes.map((crash, index) => (
             <Card key={index} className="p-3 bg-slate-700/30 border-slate-600 hover:bg-slate-700/50 transition-all">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
