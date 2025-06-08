@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge"
 import { djiData, events } from "@/lib/mock-data"
 
 export function DJIChart() {
-  const [selectedTimeframe, setSelectedTimeframe] = useState("1Y")
   const [showEvents, setShowEvents] = useState(true)
 
   const timeframes = [
@@ -39,9 +38,9 @@ export function DJIChart() {
           {timeframes.map((timeframe) => (
             <Button
               key={timeframe.value}
-              variant={selectedTimeframe === timeframe.value ? "default" : "outline"}
+              variant={"outline"}
               size="sm"
-              onClick={() => setSelectedTimeframe(timeframe.value)}
+              onClick={() => {}} // Geen filtering meer, dus geen actie
             >
               {timeframe.label}
             </Button>
@@ -97,7 +96,7 @@ export function DJIChart() {
                 dataKey="value"
                 stroke="var(--color-value)"
                 strokeWidth={2}
-                dot={false}
+                dot={true} // Line with markers
                 activeDot={{ r: 4 }}
               />
 
@@ -122,3 +121,4 @@ export function DJIChart() {
     </Card>
   )
 }
+
