@@ -19,9 +19,7 @@ export function DJIChart() {
     { label: "ALL", value: "ALL" },
   ]
 
-  return djiData.filter((item) => new Date(item.date) >= startDate)
-}
- (
+  return (
     <Card className="bg-white/60 backdrop-blur-sm border-slate-200">
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -123,4 +121,5 @@ export function DJIChart() {
     </Card>
   )
 }
+
 
