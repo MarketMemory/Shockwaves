@@ -2,6 +2,7 @@ import { ShockwavesChart } from "@/components/shockwaves-chart"
 import { CrashTimeline } from "@/components/crash-timeline"
 import { Header } from "@/components/header"
 import { ImpactCards } from "@/components/impact-cards"
+import { DJIChart } from "@/components/dji-chart"
 
 export default function HomePage() {
   return (
@@ -34,8 +35,14 @@ export default function HomePage() {
               <CrashTimeline />
             </div>
           </div>
+
+          {/* Toegevoegde TradingView DJI Chart */}
+          <div>
+            <DJIChart />
+          </div>
         </div>
       </main>
     </div>
   )
 }
+
