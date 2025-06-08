@@ -9,28 +9,15 @@ import { Badge } from "@/components/ui/badge"
 import { djiData, events } from "@/lib/mock-data"
 
 export function DJIChart() {
-  const [selectedTimeframe, setSelectedTimeframe] = useState("ALL")
+  const [showEvents, setShowEvents] = useState(true)
 
-  function filterData(timeframe: string) {
-  if (timeframe === "ALL") return djiData
-
-  const now = new Date()
-  let startDate = new Date()
-
-  switch (timeframe) {
-    case "1M":
-      startDate.setMonth(now.getMonth() - 1)
-      break
-    case "3M":
-      startDate.setMonth(now.getMonth() - 3)
-      break
-    case "6M":
-      startDate.setMonth(now.getMonth() - 6)
-      break
-    case "1Y":
-      startDate.setFullYear(now.getFullYear() - 1)
-      break
-  }
+  const timeframes = [
+    { label: "1M", value: "1M" },
+    { label: "3M", value: "3M" },
+    { label: "6M", value: "6M" },
+    { label: "1Y", value: "1Y" },
+    { label: "ALL", value: "ALL" },
+  ]
 
   return djiData.filter((item) => new Date(item.date) >= startDate)
 }
@@ -74,7 +61,7 @@ export function DJIChart() {
           className="h-[500px]"
         >
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={filterData(selectedTimeframe)} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+            <LineChart data={djiData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis
                 dataKey="date"
