@@ -56,9 +56,11 @@ npm run dev
 # Krijg gratis Alpha Vantage API key
 # https://www.alphavantage.co/support/#api-key (gratis)
 
-# Voeg toe aan Vercel Environment Variables:
-NEXT_PUBLIC_ALPHA_VANTAGE_KEY=jouw_gratis_key
+# Voeg toe aan Vercel Environment Variables (ZONDER NEXT_PUBLIC_):
+ALPHA_VANTAGE_KEY=jouw_gratis_key
 \`\`\`
+
+⚠️ **Belangrijk**: Gebruik NOOIT `NEXT_PUBLIC_` voor API keys! Dit maakt ze zichtbaar in de browser.
 
 ## 📊 Gratis Data Sources
 
